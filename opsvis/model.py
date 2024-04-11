@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -16,7 +16,9 @@ from .defo import *
 def _plot_model_2d(node_labels, element_labels, offset_nd_label, axis_off,
                    fig_wi_he, fig_lbrt, nodes_only, fmt_model,
                    fmt_model_nodes_only, node_supports, gauss_points, fmt_gauss_points,
-                   fmt_model_truss, truss_node_offset, ax):
+                   fmt_model_truss, truss_node_offset, ax, model=None):
+
+    ops = model if model is not None else _ops
 
     if not ax:
         if fig_wi_he:
@@ -369,7 +371,7 @@ def _plot_model_2d(node_labels, element_labels, offset_nd_label, axis_off,
                         color='red')
 
     if node_supports:
-        _plot_supports(node_tags, ax)
+        _plot_supports(node_tags, ax, model)
 
     ax.axis('equal')
     ax.grid(False)
@@ -377,7 +379,8 @@ def _plot_model_2d(node_labels, element_labels, offset_nd_label, axis_off,
     return ax
 
 
-def _plot_supports(node_tags, ax):
+def _plot_supports(node_tags, ax, model=None):
+    ops = model if model is not None else _ops
 
     ndim = ops.getNDM()[0]
 
@@ -505,7 +508,8 @@ def _plot_model_3d(node_labels, element_labels, offset_nd_label,
                    axis_off, az_el, fig_wi_he, fig_lbrt, local_axes,
                    nodes_only, fmt_model, node_supports, gauss_points,
                    fmt_gauss_points, fmt_model_truss,
-                   truss_node_offset, ax):
+                   truss_node_offset, ax, model=None):
+    ops = model if model is not None else _ops
 
     node_tags = ops.getNodeTags()
     ele_tags = ops.getEleTags()
@@ -839,7 +843,7 @@ def _plot_model_3d(node_labels, element_labels, offset_nd_label,
         elif (ele_classtag == EleClassTag.ShellMITC4 or
               ele_classtag == EleClassTag.ASDShellQ4 or
               ele_classtag == EleClassTag.ShellNLDKGQ or
-              ele_classtag == EleClassTag.ShellDKGQ or                            
+              ele_classtag == EleClassTag.ShellDKGQ or
               ele_classtag == EleClassTag.quad4n):
 
             nen = 4
@@ -1149,7 +1153,7 @@ def _plot_model_3d(node_labels, element_labels, offset_nd_label,
                         color='red')
 
     if node_supports:
-        _plot_supports(node_tags, ax)
+        _plot_supports(node_tags, ax, model)
 
     ax.set_box_aspect((np.ptp(ax.get_xlim3d()),
                        np.ptp(ax.get_ylim3d()),
@@ -1166,7 +1170,7 @@ def plot_model(node_labels=1, element_labels=1, offset_nd_label=False,
                node_supports=True, gauss_points=True,
                fmt_gauss_points=fmt_gauss_points,
                fmt_model_truss=fmt_model_truss,
-               truss_node_offset=0.96, ax=False):
+               truss_node_offset=0.96, ax=False, model=None):
     """Plot defined model of the structure.
 
     Args:
@@ -1229,6 +1233,8 @@ def plot_model(node_labels=1, element_labels=1, offset_nd_label=False,
     ``plot_model(node_supports=False)`` - plot the model without the supports.
 
     """
+    ops = model if model is not None else _ops
+
 
     # az_el - azimut, elevation used for 3d plots only
     node_tags = ops.getNodeTags()
@@ -1241,7 +1247,7 @@ def plot_model(node_labels=1, element_labels=1, offset_nd_label=False,
                             fig_lbrt, nodes_only, fmt_model,
                             fmt_model_nodes_only, node_supports,
                             gauss_points, fmt_gauss_points,
-                            fmt_model_truss, truss_node_offset, ax)
+                            fmt_model_truss, truss_node_offset, ax, model)
         if axis_off:
             ax.axis('off')
 
@@ -1251,7 +1257,7 @@ def plot_model(node_labels=1, element_labels=1, offset_nd_label=False,
                             fig_wi_he, fig_lbrt, local_axes,
                             nodes_only, fmt_model, node_supports,
                             gauss_points, fmt_gauss_points,
-                            fmt_model_truss, truss_node_offset, ax)
+                            fmt_model_truss, truss_node_offset, ax, model)
         if axis_off:
             ax.axis('off')
 
@@ -1275,7 +1281,7 @@ def plot_supports_and_loads_2d(nep=17):
 
 def plot_loads_2d(nep=17, sfac=False, fig_wi_he=False,
                   fig_lbrt=False, fmt_model_loads=fmt_model_loads,
-                  node_supports=True, truss_node_offset=0, ax=False):
+                  node_supports=True, truss_node_offset=0, ax=False, model=None):
     """Display the nodal and element loads applied to the 2d models.
 
     Args:
@@ -1286,6 +1292,7 @@ def plot_loads_2d(nep=17, sfac=False, fig_wi_he=False,
             Default: False.
 
     """
+    ops = model if model is not None else _ops
 
     if not ax:
         if fig_wi_he:
@@ -1300,7 +1307,7 @@ def plot_loads_2d(nep=17, sfac=False, fig_wi_he=False,
 
     ax = plot_model(node_labels=0, element_labels=0, fmt_model=fmt_model_loads,
                     node_supports=node_supports,
-                    truss_node_offset=truss_node_offset, ax=ax)
+                    truss_node_offset=truss_node_offset, ax=ax, model=Model)
     # ax.axis('equal')
 
     if not sfac:
@@ -1319,7 +1326,7 @@ def plot_loads_2d(nep=17, sfac=False, fig_wi_he=False,
     wab = False
 
     ### get Ew data
-    Ew = get_Ew_data_from_ops_domain()
+    Ew = get_Ew_data_from_ops_domain(model=model)
 
     for ele_tag in ele_tags:
 
@@ -1602,7 +1609,8 @@ def plot_loads_2d(nep=17, sfac=False, fig_wi_he=False,
     return ax
 
 
-def get_nodal_loads_from_ops_domain():
+def get_nodal_loads_from_ops_domain(model=None):
+    ops = model if model is not None else _ops
     load_at_nodes = {}
     ibeg, iend = 0, 0
 
@@ -1622,7 +1630,9 @@ def get_nodal_loads_from_ops_domain():
     return load_at_nodes
 
 
-def get_Ew_data_from_ops_domain():
+def get_Ew_data_from_ops_domain(model=None):
+
+    ops = model if model is not None else _ops
 
     Ew = {}
     ibeg = 0
@@ -1666,7 +1676,8 @@ def get_Ew_data_from_ops_domain():
     return Ew
 
 
-def get_Ew_data_from_ops_domain_3d():
+def get_Ew_data_from_ops_domain_3d(model=None):
+    ops = model if model is not None else _ops
 
     Ew = {}
     ibeg = 0
@@ -1712,7 +1723,7 @@ def get_Ew_data_from_ops_domain_3d():
 
 def plot_extruded_shapes_3d(ele_shapes, az_el=az_el,
                             fig_wi_he=False,
-                            fig_lbrt=False, ax=False):
+                            fig_lbrt=False, ax=False, model=None):
     """Plot an extruded 3d model based on cross-section dimenions.
 
     Three arrows present local section axes: green - local x-axis,
@@ -1751,6 +1762,7 @@ def plot_extruded_shapes_3d(ele_shapes, az_el=az_el,
       functions to return section dimensions. A workaround is to have own
       Python helper functions to reuse data specified once
     """
+    ops = model if model is not None else _ops
 
     ele_tags = ops.getEleTags()
 
@@ -1807,7 +1819,7 @@ def plot_extruded_shapes_3d(ele_shapes, az_el=az_el,
         if shape_type == 'rect' or shape_type == 'I':
             if shape_type == 'rect':
                 verts = _plot_extruded_shapes_3d_rect(ecrd, g,
-                                                      shape_args)
+                                                      shape_args, model)
 
             elif shape_type == 'I':
                 verts = _plot_extruded_shapes_3d_double_T(ecrd, g,
@@ -1819,7 +1831,7 @@ def plot_extruded_shapes_3d(ele_shapes, az_el=az_el,
 
         elif shape_type == 'circ':
             X, Y, Z = _plot_extruded_shapes_3d_circ(ecrd, g,
-                                                    shape_args)
+                                                    shape_args, model)
             ax.plot_surface(X, Y, Z, linewidths=0.4, edgecolors='k',
                             alpha=.25)
 
@@ -1842,6 +1854,7 @@ def plot_extruded_shapes_3d(ele_shapes, az_el=az_el,
 
 
 def _plot_extruded_shapes_3d_double_T(ecrd, g, shape_args):
+    ops = model if model is not None else _ops
     bf, d, tw, tf = shape_args
 
     za, zb = tw / 2, bf / 2

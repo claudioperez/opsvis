@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.tri as tri
@@ -6,7 +6,8 @@ import matplotlib.tri as tri
 from .settings import *
 
 
-def stress_2d_ele_tags_only(ele_tags):
+def stress_2d_ele_tags_only(ele_tags, model=None):
+    ops = model if model is not None else _ops
 
     Stress2dEleClasstags = set([EleClassTag.tri3n,
                                 EleClassTag.tri6n,
@@ -23,7 +24,7 @@ def stress_2d_ele_tags_only(ele_tags):
     return ele_tags_2d_tris_quads_only
 
 
-def sig_out_per_node(how_many='all'):
+def sig_out_per_node(how_many='all', model=None):
     """Return a 2d numpy array of stress components per OpenSees node.
 
     Three first stress components (sxx, syy, sxy) are calculated and
@@ -47,6 +48,7 @@ def sig_out_per_node(how_many='all'):
        s1, s2: principal stresses
        angle: angle of the principal stress s1
     """
+    ops = model if model is not None else _ops
     ele_tags = ops.getEleTags()
     node_tags = ops.getNodeTags()
     n_nodes = len(node_tags)
@@ -108,7 +110,7 @@ def sig_out_per_node(how_many='all'):
     return sig_out
 
 
-def sig_component_per_node(stress_str):
+def sig_component_per_node(stress_str, model=None):
     """Return a 2d numpy array of stress components per OpenSees node.
 
     Three first stress components (sxx, syy, sxy) are calculated and
@@ -132,9 +134,10 @@ def sig_component_per_node(stress_str):
        s1, s2: principal stresses
        angle: angle of the principal stress s1
     """
+    ops = model if model is not None else _ops
 
     ele_tags_all = ops.getEleTags()
-    ele_tags = stress_2d_ele_tags_only(ele_tags_all)
+    ele_tags = stress_2d_ele_tags_only(ele_tags_all, model=model)
 
     ele_classtag = ops.getEleClassTags(ele_tags[0])[0]
 
@@ -203,7 +206,7 @@ def sig_component_per_node(stress_str):
     return sig_out_vec
 
 
-def princ_stress(sig):
+def princ_stress(sig, model=None):
     """Return a tuple (s1, s2, angle): principal stresses (plane stress) and angle
     Args:
         sig (ndarray): input array of stresses at nodes: sxx, syy, sxy (tau)
@@ -212,6 +215,8 @@ def princ_stress(sig):
         out (ndarray): 1st row is first principal stress s1, 2nd row is second
            principal stress s2, 3rd row is the angle of s1
     """
+    ops = model if model is not None else _ops
+
     sx, sy, tau = sig[0], sig[1], sig[2]
 
     ds = (sx-sy)/2
@@ -684,7 +689,7 @@ def plot_mesh_2d(nds_crd, eles_conn, lw=0.4, ec='k'):
 
 # def plot_stress_2d(nds_val, mesh_outline=1, cmap='turbo', levels=50,
 #                    fig_wi_he=False, fig_lbrt=False, ax=False):
-def plot_stress_2d(nds_val, mesh_outline=1, cmap='turbo', levels=50):
+def plot_stress_2d(nds_val, mesh_outline=1, cmap='turbo', levels=50, model=None):
     """
     Plot stress distribution of a 2d elements of a 2d model.
 
@@ -700,6 +705,7 @@ def plot_stress_2d(nds_val, mesh_outline=1, cmap='turbo', levels=50):
     Usage:
         See demo_quads_4x4.py example.
     """
+    ops = model if model is not None else _ops
 
     node_tags, ele_tags_all = ops.getNodeTags(), ops.getEleTags()
 
@@ -923,7 +929,7 @@ def quad8n_val_at_center(vals):
     return val_c1
 
 
-def plot_stress(stress_str, mesh_outline=1, cmap='turbo', levels=50):
+def plot_stress(stress_str, mesh_outline=1, cmap='turbo', levels=50, model=None):
     """Plot stress distribution of the model.
 
     Args:
@@ -948,11 +954,12 @@ def plot_stress(stress_str, mesh_outline=1, cmap='turbo', levels=50):
 
     :ref:`opsvis_sig_out_per_node`
     """
+    ops = model if model is not None else _ops
 
     ndim = ops.getNDM()[0]
 
     if ndim == 2:
-        _plot_stress_2d(stress_str, mesh_outline, cmap, levels)
+        _plot_stress_2d(stress_str, mesh_outline, cmap, levels, model=model)
         # if axis_off:
         #     plt.axis('off')
 
@@ -966,8 +973,9 @@ def plot_stress(stress_str, mesh_outline=1, cmap='turbo', levels=50):
     # plt.show()  # call this from main py file for more control
 
 
-def _plot_stress_2d(stress_str, mesh_outline, cmap, levels):
+def _plot_stress_2d(stress_str, mesh_outline, cmap, levels, model=None):
     """See documentation for plot_stress command"""
+    ops = model if model is not None else _ops
 
     # node_tags = ops.getNodeTags()
     # ele_tags = ops.getEleTags()
@@ -991,5 +999,5 @@ def _plot_stress_2d(stress_str, mesh_outline, cmap, levels):
 
     # nds_val = sig_out[:, switcher[stress_str]]
 
-    nds_val = sig_component_per_node(stress_str)
-    plot_stress_2d(nds_val, mesh_outline, cmap, levels)
+    nds_val = sig_component_per_node(stress_str, model=model)
+    plot_stress_2d(nds_val, mesh_outline, cmap, levels, model=model)

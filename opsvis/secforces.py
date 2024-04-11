@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -9,7 +9,7 @@ from matplotlib.animation import FuncAnimation
 import matplotlib.tri as tri
 
 from .settings import *
-from . import model
+from . import model as modelvis
 
 
 def section_force_distribution_2d(ecrd, pl, nep=2,
@@ -355,7 +355,7 @@ def section_force_diagram_2d(sf_type, sfac=1., nep=17,
                              ref_vert_lines=True,
                              end_max_values=True,
                              node_supports=True, ax=False,
-                             alt_model_plot=1):
+                             alt_model_plot=1, model=None):
     """Display section forces diagram for 2d beam column model.
 
     This function plots a section forces diagram for 2d beam column elements
@@ -407,6 +407,7 @@ def section_force_diagram_2d(sf_type, sfac=1., nep=17,
     Usage:
         See example: demo_portal_frame.py
     """
+    ops = model if model is not None else _ops
 
     if not ax:
         if fig_wi_he:
@@ -420,11 +421,11 @@ def section_force_diagram_2d(sf_type, sfac=1., nep=17,
             fig.subplots_adjust(left=fleft, bottom=fbottom, right=fright, top=ftop)
 
     if alt_model_plot == 1:
-        ax = model.plot_model(node_labels=0, element_labels=0,
+        ax = modelvis.plot_model(node_labels=0, element_labels=0,
                               fmt_model=fmt_model_secforce,
                               node_supports=False,
                               fmt_model_truss=fmt_model_secforce,
-                              truss_node_offset=0, ax=ax)
+                              truss_node_offset=0, ax=ax, model=model)
     else:
         pass
 
@@ -432,7 +433,7 @@ def section_force_diagram_2d(sf_type, sfac=1., nep=17,
     maxVal, minVal = -np.inf, np.inf
     ele_tags = ops.getEleTags()
 
-    Ew = model.get_Ew_data_from_ops_domain()
+    Ew = modelvis.get_Ew_data_from_ops_domain(model=model)
 
     for ele_tag in ele_tags:
 
@@ -580,7 +581,7 @@ def section_force_diagram_2d(sf_type, sfac=1., nep=17,
 
     if node_supports:
         node_tags = ops.getNodeTags()
-        ax = model._plot_supports(node_tags, ax)
+        ax = modelvis._plot_supports(node_tags, ax, model=model)
 
     # ax.grid(False)
 
@@ -593,7 +594,7 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
                              ref_vert_lines=True,
                              end_max_values=True,
                              dir_plt=0, node_supports=True, ax=False,
-                             alt_model_plot=1):
+                             alt_model_plot=1, model=None):
     """Display section forces diagram of a 3d beam column model.
 
     This function plots section forces diagrams for 3d beam column elements
@@ -646,6 +647,7 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
     Add support for other element loads available in OpenSees: partial
     (trapezoidal) uniform element load, and 'beamPoint' element load.
     """
+    ops = model if model is not None else _ops
 
     # If supplied axis can be plotted to
     if hasattr(ax, "name") and (ax.name == "3d"):
@@ -669,11 +671,11 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
     ax.view_init(azim=azim, elev=elev)
 
     if alt_model_plot == 1:
-        ax = model.plot_model(node_labels=0, element_labels=0,
+        ax = modelvis.plot_model(node_labels=0, element_labels=0,
                               fmt_model=fmt_model_secforce,
                               node_supports=False,
                               fmt_model_truss=fmt_model_secforce,
-                              truss_node_offset=0, ax=ax)
+                              truss_node_offset=0, ax=ax, model=model)
     else:
         pass
 
@@ -681,7 +683,7 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
     maxVal, minVal = -np.inf, np.inf
     ele_tags = ops.getEleTags()
 
-    Ew = model.get_Ew_data_from_ops_domain_3d()
+    Ew = modelvis.get_Ew_data_from_ops_domain_3d(model=model)
 
     for i, ele_tag in enumerate(ele_tags):
 
@@ -719,7 +721,7 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
             else:
                 pass
 
-            G, _ = model.rot_transf_3d(ecrd, g)
+            G, _ = modelvis.rot_transf_3d(ecrd, g)
 
             g = G[:3, :3]
 
@@ -857,6 +859,6 @@ def section_force_diagram_3d(sf_type, sfac=1., nep=17,
 
     if node_supports:
         node_tags = ops.getNodeTags()
-        ax = model._plot_supports(node_tags, ax)
+        ax = modelvis._plot_supports(node_tags, ax, model=model)
 
     return minVal, maxVal, ax

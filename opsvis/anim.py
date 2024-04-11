@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
@@ -9,7 +9,9 @@ from .defo import *
 
 def _anim_mode_2d(modeNo, sfac, nep, unDefoFlag, fmt_defo, fmt_undefo,
                   interpFlag, endDispFlag, fig_wi_he,
-                  fig_lbrt, xlim, ylim, ax):
+                  fig_lbrt, xlim, ylim, ax, model=None):
+
+    ops = model if model is not None else _ops
 
     if not ax:
         if fig_wi_he:
@@ -211,7 +213,7 @@ def anim_mode(modeNo, sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
               fmt_undefo=fmt_undefo, interpFlag=1, endDispFlag=1,
               Eo=0, az_el=az_el,
               fig_wi_he=False, fig_lbrt=False, xlim=[0, 1], ylim=[0, 1],
-              ax=False):
+              ax=False, model=None):
     """Make animation of a mode shape obtained from eigenvalue solution.
 
     Args:
@@ -248,6 +250,7 @@ def anim_mode(modeNo, sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
     See also:
         anim_mode()
     """
+    ops = model if model is not None else _ops
 
 
     node_tags = ops.getNodeTags()
@@ -287,7 +290,7 @@ def anim_mode(modeNo, sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
         anim = _anim_mode_2d(modeNo, sfac, nep, unDefoFlag, fmt_defo,
                              fmt_undefo, interpFlag, endDispFlag,
                              fig_wi_he, fig_lbrt,
-                             xlim, ylim, ax)
+                             xlim, ylim, ax, model)
 
     # elif ndim == 3:
     #     if not sfac:
@@ -328,7 +331,8 @@ def anim_mode(modeNo, sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
 
 def _anim_defo_2d(Eds, timeV, sfac, nep, unDefoFlag, fmt_defo, fmt_undefo,
                   interpFlag, endDispFlag,
-                  fig_wi_he, fig_lbrt, xlim, ylim, ax):
+                  fig_wi_he, fig_lbrt, xlim, ylim, ax, model=None):
+    ops = model if model is not None else _ops
 
     if not ax:
         if fig_wi_he:
@@ -526,7 +530,7 @@ def anim_defo(Eds, timeV, sfac, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
               fmt_undefo=fmt_undefo, interpFlag=1, endDispFlag=1,
               az_el=az_el,
               fig_wi_he=False, fig_lbrt=False, xlim=[0, 1],
-              ylim=[0, 1], ax=False):
+              ylim=[0, 1], ax=False, model=None):
     """Make animation of the deformed shape computed by transient analysis
 
     Args:
@@ -565,6 +569,7 @@ def anim_defo(Eds, timeV, sfac, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
 
     See also:
     """
+    ops = model if model is not None else _ops
 
     node_tags = ops.getNodeTags()
 
@@ -573,7 +578,7 @@ def anim_defo(Eds, timeV, sfac, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
     if ndim == 2:
         anim = _anim_defo_2d(Eds, timeV, sfac, nep, unDefoFlag, fmt_defo,
                              fmt_undefo, interpFlag, endDispFlag,
-                             fig_wi_he, fig_lbrt, xlim, ylim, ax)
+                             fig_wi_he, fig_lbrt, xlim, ylim, ax, model)
 
     else:
         print(f'\nWarning! ndim: {ndim} not supported yet.')

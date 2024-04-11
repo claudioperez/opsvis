@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.patches import Circle, Polygon, Wedge
@@ -10,7 +10,7 @@ from .settings import *
 # written by D. Vamvatsikos available at
 # http://users.ntua.gr/divamva/software.html (plotSection.zip)
 def plot_fiber_section(fib_sec_list, fillflag=1,
-                       matcolor=['y', 'b', 'r', 'g', 'm', 'k']):
+                       matcolor=['y', 'b', 'r', 'g', 'm', 'k'], model=None):
     """Plot fiber cross-section.
 
     Args:
@@ -45,6 +45,8 @@ def plot_fiber_section(fib_sec_list, fillflag=1,
     See also:
         ``opsvis.fib_sec_list_to_cmds()``
     """
+    ops = model if model is not None else _ops
+
 
     fig, ax = plt.subplots()
     ax.set_xlabel('z')
@@ -161,7 +163,7 @@ def plot_fiber_section(fib_sec_list, fillflag=1,
             ax.axis('equal')
 
 
-def fib_sec_list_to_cmds(fib_sec_list):
+def fib_sec_list_to_cmds(fib_sec_list, model=None):
     """Reuses fib_sec_list to define fiber section in OpenSees.
 
     At present it is not possible to extract fiber section data from
@@ -184,6 +186,8 @@ def fib_sec_list_to_cmds(fib_sec_list):
     ``opsvis.plot_fiber_section()``
 
     """
+    ops = model if model is not None else _ops
+
     for dat in fib_sec_list:
         if dat[0] == 'section':
             secTag, GJ = dat[2], dat[4]

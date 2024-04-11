@@ -1,4 +1,4 @@
-import openseespy.opensees as ops
+import openseespy.opensees as _ops
 import numpy as np
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -15,7 +15,8 @@ from . import model as opsvmodel
 def _plot_defo_mode_2d(modeNo, sfac, nep, unDefoFlag, fmt_defo, fmt_undefo,
                        fmt_defo_faces, fmt_undefo_faces,
                        interpFlag, endDispFlag, fmt_nodes,
-                       fig_wi_he, fig_lbrt, node_supports, ax):
+                       fig_wi_he, fig_lbrt, node_supports, ax, model=None):
+    ops = model if model is not None else _ops
 
     node_tags = ops.getNodeTags()
     ele_tags = ops.getEleTags()
@@ -419,7 +420,9 @@ def ro_rotated(L, fi0, fi):
 def _plot_defo_mode_3d(modeNo, sfac, nep, unDefoFlag, fmt_defo, fmt_undefo,
                        fmt_defo_faces, fmt_undefo_faces,
                        interpFlag, endDispFlag, fmt_nodes, az_el,
-                       fig_wi_he, fig_lbrt, node_supports, ax):
+                       fig_wi_he, fig_lbrt, node_supports, ax, model=None):
+
+    ops = model if model is not None else _ops
 
     node_tags = ops.getNodeTags()
     ele_tags = ops.getEleTags()
@@ -857,7 +860,7 @@ def plot_defo(sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
               fmt_undefo=fmt_undefo, fmt_defo_faces=fmt_defo_faces,
               fmt_undefo_faces=fmt_undefo_faces, interpFlag=1, endDispFlag=0,
               fmt_nodes=fmt_nodes, Eo=0, az_el=az_el,
-              fig_wi_he=False, fig_lbrt=False, node_supports=True, ax=False):
+              fig_wi_he=False, fig_lbrt=False, node_supports=True, ax=False, model=None):
     """Plot deformed shape of the structure.
 
     Args:
@@ -895,6 +898,8 @@ def plot_defo(sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
     undeformed (original) mesh and without showing markers at the
     element ends.
     """
+    ops = model if model is not None else _ops
+
     node_tags = ops.getNodeTags()
 
     # calculate sfac
@@ -933,7 +938,7 @@ def plot_defo(sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
                                 fmt_undefo, fmt_defo_faces,
                                 fmt_undefo_faces, interpFlag,
                                 endDispFlag, fmt_nodes, fig_wi_he,
-                                fig_lbrt, node_supports, ax)
+                                fig_lbrt, node_supports, ax, model)
 
     elif ndim == 3:
         if not sfac:
@@ -970,7 +975,7 @@ def plot_defo(sfac=False, nep=17, unDefoFlag=1, fmt_defo=fmt_defo,
                                 fmt_undefo_faces, interpFlag,
                                 endDispFlag, fmt_nodes, az_el,
                                 fig_wi_he, fig_lbrt, node_supports,
-                                ax)
+                                ax, model)
 
     else:
         print(f'\nWarning! ndim: {ndim} not supported yet.')
@@ -985,7 +990,7 @@ def plot_mode_shape(modeNo, sfac=False, nep=17, unDefoFlag=1,
                     interpFlag=1, endDispFlag=1,
                     fmt_nodes=fmt_nodes, Eo=0,
                     az_el=az_el, fig_wi_he=False,
-                    fig_lbrt=False, node_supports=True, ax=False):
+                    fig_lbrt=False, node_supports=True, ax=False, model=None):
     """Plot mode shape of the structure obtained from eigenvalue analysis.
 
     Args:
@@ -1027,6 +1032,7 @@ def plot_mode_shape(modeNo, sfac=False, nep=17, unDefoFlag=1,
     See also:
         plot_defo()
     """
+    ops = model if model is not None else _ops
 
     node_tags = ops.getNodeTags()
 
@@ -1063,7 +1069,7 @@ def plot_mode_shape(modeNo, sfac=False, nep=17, unDefoFlag=1,
                                 fmt_defo, fmt_undefo, fmt_defo_faces,
                                 fmt_undefo_faces, interpFlag,
                                 endDispFlag, fmt_nodes, fig_wi_he,
-                                fig_lbrt, node_supports, ax)
+                                fig_lbrt, node_supports, ax, model)
 
     elif ndim == 3:
         if not sfac:
@@ -1097,7 +1103,7 @@ def plot_mode_shape(modeNo, sfac=False, nep=17, unDefoFlag=1,
                                 fmt_undefo_faces, interpFlag,
                                 endDispFlag, fmt_nodes, az_el,
                                 fig_wi_he, fig_lbrt, node_supports,
-                                ax)
+                                ax, model)
 
     else:
         print(f'\nWarning! ndim: {ndim} not supported yet.')
@@ -1231,13 +1237,14 @@ def beam_defo_interp_3d(ecrd, g, u, sfac, nep=17):
     return crd_xc, crd_yc, crd_zc
 
 
-def max_u_abs_from_beam_defo_interp_2d(max_u_abs, nep):
+def max_u_abs_from_beam_defo_interp_2d(max_u_abs, nep, model=None):
     """
     Find maximum displacement from the interpolated tranverse deformation.
 
     Useful if the translational nodal displacement are small and transverse
     deformation is due to nodal rotations.
     """
+    ops = model if model is not None else _ops
 
     ele_tags = ops.getEleTags()
 
@@ -1277,13 +1284,14 @@ def max_u_abs_from_beam_defo_interp_2d(max_u_abs, nep):
     return max_u_abs
 
 
-def max_u_abs_from_beam_defo_interp_3d(max_u_abs, nep):
+def max_u_abs_from_beam_defo_interp_3d(max_u_abs, nep, model=None):
     """
     Find maximum displacement from the interpolated tranverse deformation.
 
     Useful if the translational nodal displacement are small and transverse
     deformation is due to nodal rotations.
     """
+    ops = model if model is not None else _ops
 
     nen, ndf = 2, 6
 
